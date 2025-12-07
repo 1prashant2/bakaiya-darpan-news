@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import logo from '@/assets/logo.jpeg';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -78,11 +79,14 @@ export function Header() {
       {/* Logo and search */}
       <div className="news-container py-4">
         <div className="flex items-center justify-between gap-4">
-          <Link to="/" className="flex-shrink-0">
-            <h1 className="text-2xl sm:text-3xl font-bold text-primary">
-              बकैया दर्पण
-            </h1>
-            <p className="text-xs text-muted-foreground">सत्य, निष्पक्ष र भरपर्दो समाचार</p>
+          <Link to="/" className="flex-shrink-0 flex items-center gap-3">
+            <img src={logo} alt="प्रेस दर्पण" className="h-12 w-12 sm:h-14 sm:w-14 rounded-full object-cover" />
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-primary">
+                प्रेस दर्पण
+              </h1>
+              <p className="text-xs text-muted-foreground">सत्य, निष्पक्ष र भरपर्दो समाचार</p>
+            </div>
           </Link>
 
           {/* Search bar - Desktop */}

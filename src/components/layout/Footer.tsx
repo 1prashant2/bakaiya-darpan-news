@@ -11,9 +11,9 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About */}
           <div>
-            <h3 className="text-xl font-bold mb-4 text-primary-foreground">बकैया दर्पण</h3>
+            <h3 className="text-xl font-bold mb-4 text-primary-foreground">प्रेस दर्पण</h3>
             <p className="text-sm text-background/80 leading-relaxed">
-              बकैया दर्पण एक स्वतन्त्र र निष्पक्ष अनलाइन समाचार पोर्टल हो। हामी सत्य र तथ्यमा आधारित समाचार प्रस्तुत गर्न प्रतिबद्ध छौं।
+              प्रेस दर्पण एक स्वतन्त्र र निष्पक्ष अनलाइन समाचार पोर्टल हो। हामी सत्य र तथ्यमा आधारित समाचार प्रस्तुत गर्न प्रतिबद्ध छौं।
             </p>
             <div className="flex gap-4 mt-4">
               <a href="#" className="text-background/60 hover:text-primary transition-colors">
@@ -93,7 +93,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-background/20 mt-8 pt-6 text-center text-sm text-background/60">
-          <p>© {new Date().getFullYear()} बकैया दर्पण। सर्वाधिकार सुरक्षित।</p>
+          <p>© {new Date().getFullYear()} प्रेस दर्पण। सर्वाधिकार सुरक्षित।</p>
         </div>
       </div>
     </footer>
