@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { ArticleList } from '@/components/admin/ArticleList';
-import { Article } from '@/lib/types';
-import { LayoutDashboard, FileText, FolderOpen, Users } from 'lucide-react';
+import { CategoryList } from '@/components/admin/CategoryList';
+import { Article, Category } from '@/lib/types';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LayoutDashboard, FileText, FolderOpen } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { user, isAdmin, isEditor, loading: authLoading } = useAuth();
@@ -34,6 +36,20 @@ export default function AdminDashboard() {
     enabled: !!user && (isAdmin || isEditor),
   });
 
+  const { data: categories = [], isLoading: categoriesLoading, refetch: refetchCategories } = useQuery({
+    queryKey: ['admin-categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+      return data as Category[];
+    },
+    enabled: !!user && isAdmin,
+  });
+
   const { data: stats } = useQuery({
     queryKey: ['admin-stats'],
     queryFn: async () => {
@@ -43,13 +59,13 @@ export default function AdminDashboard() {
       ]);
 
       const articles = articlesRes.data || [];
-      const categories = categoriesRes.data || [];
+      const categoriesData = categoriesRes.data || [];
 
       return {
         totalArticles: articles.length,
         publishedArticles: articles.filter(a => a.is_published).length,
         draftArticles: articles.filter(a => !a.is_published).length,
-        totalCategories: categories.length,
+        totalCategories: categoriesData.length,
       };
     },
     enabled: !!user && (isAdmin || isEditor),
@@ -136,12 +152,39 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Article List */}
-        <ArticleList 
-          articles={articles} 
-          isLoading={isLoading} 
-          onRefresh={refetch}
-        />
+        {/* Tabs for Articles and Categories */}
+        <Tabs defaultValue="articles" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="articles" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              समाचारहरू
+            </TabsTrigger>
+            {isAdmin && (
+              <TabsTrigger value="categories" className="flex items-center gap-2">
+                <FolderOpen className="h-4 w-4" />
+                श्रेणीहरू
+              </TabsTrigger>
+            )}
+          </TabsList>
+          
+          <TabsContent value="articles">
+            <ArticleList 
+              articles={articles} 
+              isLoading={isLoading} 
+              onRefresh={refetch}
+            />
+          </TabsContent>
+          
+          {isAdmin && (
+            <TabsContent value="categories">
+              <CategoryList 
+                categories={categories} 
+                isLoading={categoriesLoading} 
+                onRefresh={refetchCategories}
+              />
+            </TabsContent>
+          )}
+        </Tabs>
       </main>
     </div>
   );
