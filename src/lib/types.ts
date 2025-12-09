@@ -30,7 +30,7 @@ export interface Profile {
   updated_at: string;
 }
 
-export type AppRole = 'admin' | 'editor' | 'reader';
+export type AppRole = 'admin' | 'editor' | 'reader' | 'super_admin' | 'author';
 
 export interface UserRole {
   id: string;

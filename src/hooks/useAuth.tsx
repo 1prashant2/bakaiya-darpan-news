@@ -13,6 +13,11 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   isAdmin: boolean;
   isEditor: boolean;
+  isSuperAdmin: boolean;
+  isAuthor: boolean;
+  canPublish: boolean;
+  canManageUsers: boolean;
+  canManageCategories: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -92,6 +97,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUserRole(null);
   };
 
+  const isSuperAdmin = userRole === 'super_admin';
+  const isAdmin = userRole === 'admin' || isSuperAdmin;
+  const isEditor = userRole === 'editor' || isAdmin;
+  const isAuthor = userRole === 'author';
+  const canPublish = isEditor; // super_admin, admin, or editor can publish
+  const canManageUsers = isSuperAdmin;
+  const canManageCategories = isAdmin; // super_admin or admin can manage categories
+
   const value = {
     user,
     session,
@@ -100,8 +113,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signIn,
     signUp,
     signOut,
-    isAdmin: userRole === 'admin',
-    isEditor: userRole === 'editor' || userRole === 'admin',
+    isAdmin,
+    isEditor,
+    isSuperAdmin,
+    isAuthor,
+    canPublish,
+    canManageUsers,
+    canManageCategories,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
