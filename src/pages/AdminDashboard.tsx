@@ -5,12 +5,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { ArticleList } from '@/components/admin/ArticleList';
 import { CategoryList } from '@/components/admin/CategoryList';
+import { UserManagement } from '@/components/admin/UserManagement';
 import { Article, Category } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LayoutDashboard, FileText, FolderOpen } from 'lucide-react';
+import { LayoutDashboard, FileText, FolderOpen, Users } from 'lucide-react';
 
 export default function AdminDashboard() {
-  const { user, isAdmin, isEditor, loading: authLoading } = useAuth();
+  const { user, isAdmin, isEditor, isSuperAdmin, canManageCategories, canManageUsers, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -152,17 +153,23 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Tabs for Articles and Categories */}
+        {/* Tabs for Articles, Categories, and Users */}
         <Tabs defaultValue="articles" className="space-y-4">
           <TabsList>
             <TabsTrigger value="articles" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               समाचारहरू
             </TabsTrigger>
-            {isAdmin && (
+            {canManageCategories && (
               <TabsTrigger value="categories" className="flex items-center gap-2">
                 <FolderOpen className="h-4 w-4" />
                 श्रेणीहरू
+              </TabsTrigger>
+            )}
+            {canManageUsers && (
+              <TabsTrigger value="users" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                प्रयोगकर्ताहरू
               </TabsTrigger>
             )}
           </TabsList>
@@ -175,13 +182,19 @@ export default function AdminDashboard() {
             />
           </TabsContent>
           
-          {isAdmin && (
+          {canManageCategories && (
             <TabsContent value="categories">
               <CategoryList 
                 categories={categories} 
                 isLoading={categoriesLoading} 
                 onRefresh={refetchCategories}
               />
+            </TabsContent>
+          )}
+
+          {canManageUsers && (
+            <TabsContent value="users">
+              <UserManagement />
             </TabsContent>
           )}
         </Tabs>
