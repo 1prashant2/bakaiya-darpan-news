@@ -20,11 +20,13 @@ export type Database = {
           category_id: string | null
           content: string
           created_at: string | null
+          district_id: string | null
           excerpt: string | null
           id: string
           image_url: string | null
           is_featured: boolean | null
           is_published: boolean | null
+          province_id: string | null
           slug: string
           title: string
           updated_at: string | null
@@ -35,11 +37,13 @@ export type Database = {
           category_id?: string | null
           content: string
           created_at?: string | null
+          district_id?: string | null
           excerpt?: string | null
           id?: string
           image_url?: string | null
           is_featured?: boolean | null
           is_published?: boolean | null
+          province_id?: string | null
           slug: string
           title: string
           updated_at?: string | null
@@ -50,11 +54,13 @@ export type Database = {
           category_id?: string | null
           content?: string
           created_at?: string | null
+          district_id?: string | null
           excerpt?: string | null
           id?: string
           image_url?: string | null
           is_featured?: boolean | null
           is_published?: boolean | null
+          province_id?: string | null
           slug?: string
           title?: string
           updated_at?: string | null
@@ -68,6 +74,20 @@ export type Database = {
             referencedRelation: "categories"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "articles_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "districts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articles_province_id_fkey"
+            columns: ["province_id"]
+            isOneToOne: false
+            referencedRelation: "provinces"
+            referencedColumns: ["id"]
+          },
         ]
       }
       categories: {
@@ -75,21 +95,59 @@ export type Database = {
           created_at: string | null
           id: string
           name: string
+          name_en: string | null
           slug: string
         }
         Insert: {
           created_at?: string | null
           id?: string
           name: string
+          name_en?: string | null
           slug: string
         }
         Update: {
           created_at?: string | null
           id?: string
           name?: string
+          name_en?: string | null
           slug?: string
         }
         Relationships: []
+      }
+      districts: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          name_en: string
+          province_id: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          name_en: string
+          province_id: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          name_en?: string
+          province_id?: string
+          slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "districts_province_id_fkey"
+            columns: ["province_id"]
+            isOneToOne: false
+            referencedRelation: "provinces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -112,6 +170,30 @@ export type Database = {
           id?: string
           name?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      provinces: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          name_en: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          name_en: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          name_en?: string
+          slug?: string
         }
         Relationships: []
       }

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useCategories } from '@/hooks/useCategories';
+import { useProvinces, useDistricts } from '@/hooks/useLocations';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,14 +34,26 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
   const [excerpt, setExcerpt] = useState(article?.excerpt || '');
   const [author, setAuthor] = useState(article?.author || 'सम्पादक');
   const [categoryId, setCategoryId] = useState(article?.category_id || '');
+  const [provinceId, setProvinceId] = useState(article?.province_id || '');
+  const [districtId, setDistrictId] = useState(article?.district_id || '');
   const [imageUrl, setImageUrl] = useState(article?.image_url || '');
   const [isPublished, setIsPublished] = useState(article?.is_published || false);
   const [isFeatured, setIsFeatured] = useState(article?.is_featured || false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: categories } = useCategories();
+  const { data: provinces } = useProvinces();
+  const { data: districts } = useDistricts(provinceId || undefined);
+  const { t, language } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Reset district when province changes
+  useEffect(() => {
+    if (!isEditing) {
+      setDistrictId('');
+    }
+  }, [provinceId, isEditing]);
 
   // Generate slug from title
   useEffect(() => {
@@ -59,7 +73,7 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
 
     if (!title.trim() || !content.trim() || !categoryId) {
       toast({
-        title: 'त्रुटि',
+        title: t.common.error,
         description: 'कृपया सबै आवश्यक फिल्डहरू भर्नुहोस्',
         variant: 'destructive',
       });
@@ -76,6 +90,8 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
         excerpt: excerpt.trim() || content.substring(0, 150) + '...',
         author: author.trim(),
         category_id: categoryId,
+        province_id: provinceId || null,
+        district_id: districtId || null,
         image_url: imageUrl || null,
         is_published: isPublished,
         is_featured: isFeatured,
@@ -111,13 +127,21 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
     } catch (error: any) {
       console.error('Error saving article:', error);
       toast({
-        title: 'त्रुटि',
+        title: t.common.error,
         description: error.message || 'समाचार सेभ गर्न सकिएन',
         variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const getCategoryName = (category: { name: string; name_en?: string | null }) => {
+    return language === 'en' && category.name_en ? category.name_en : category.name;
+  };
+
+  const getLocationName = (location: { name: string; name_en: string }) => {
+    return language === 'en' ? location.name_en : location.name;
   };
 
   return (
@@ -129,18 +153,18 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
           onClick={() => navigate('/admin')}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          फिर्ता जानुहोस्
+          {t.common.back}
         </Button>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              सेभ हुँदैछ...
+              {t.common.loading}
             </>
           ) : (
             <>
               <Save className="h-4 w-4 mr-2" />
-              {isEditing ? 'अपडेट गर्नुहोस्' : 'प्रकाशित गर्नुहोस्'}
+              {isEditing ? t.common.save : t.common.submit}
             </>
           )}
         </Button>
@@ -150,7 +174,7 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="title">शीर्षक *</Label>
+            <Label htmlFor="title">{t.admin.articleTitle} *</Label>
             <Input
               id="title"
               value={title}
@@ -174,12 +198,12 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label>सामग्री *</Label>
+            <Label>{t.admin.articleContent} *</Label>
             <RichTextEditor content={content} onChange={setContent} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="excerpt">संक्षिप्त विवरण</Label>
+            <Label htmlFor="excerpt">{t.admin.articleExcerpt}</Label>
             <Textarea
               id="excerpt"
               value={excerpt}
@@ -196,7 +220,7 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
             <h3 className="font-semibold">प्रकाशन सेटिङ</h3>
 
             <div className="flex items-center justify-between">
-              <Label htmlFor="is-published">प्रकाशित गर्ने</Label>
+              <Label htmlFor="is-published">{t.admin.isPublished}</Label>
               <Switch
                 id="is-published"
                 checked={isPublished}
@@ -205,7 +229,7 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
             </div>
 
             <div className="flex items-center justify-between">
-              <Label htmlFor="is-featured">फिचर्ड</Label>
+              <Label htmlFor="is-featured">{t.admin.isFeatured}</Label>
               <Switch
                 id="is-featured"
                 checked={isFeatured}
@@ -215,15 +239,15 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label>श्रेणी *</Label>
+            <Label>{t.admin.articleCategory} *</Label>
             <Select value={categoryId} onValueChange={setCategoryId}>
               <SelectTrigger>
-                <SelectValue placeholder="श्रेणी छान्नुहोस्" />
+                <SelectValue placeholder={t.admin.selectCategory} />
               </SelectTrigger>
               <SelectContent>
                 {categories?.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
-                    {category.name}
+                    {getCategoryName(category)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -231,7 +255,47 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="author">लेखक</Label>
+            <Label>{t.admin.articleProvince}</Label>
+            <Select value={provinceId} onValueChange={setProvinceId}>
+              <SelectTrigger>
+                <SelectValue placeholder={t.admin.selectProvince} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">
+                  {t.admin.allProvinces}
+                </SelectItem>
+                {provinces?.map((province) => (
+                  <SelectItem key={province.id} value={province.id}>
+                    {getLocationName(province)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {provinceId && (
+            <div className="space-y-2">
+              <Label>{t.admin.articleDistrict}</Label>
+              <Select value={districtId} onValueChange={setDistrictId}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t.admin.selectDistrict} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">
+                    {t.admin.allDistricts}
+                  </SelectItem>
+                  {districts?.map((district) => (
+                    <SelectItem key={district.id} value={district.id}>
+                      {getLocationName(district)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="author">{t.admin.articleAuthor}</Label>
             <Input
               id="author"
               value={author}
@@ -241,7 +305,7 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label>फिचर्ड चित्र</Label>
+            <Label>{t.admin.articleImage}</Label>
             <ImageUpload
               currentImage={imageUrl}
               onImageUpload={setImageUrl}
