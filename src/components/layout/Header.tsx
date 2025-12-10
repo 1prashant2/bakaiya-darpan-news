@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, Menu, X, User, LogOut } from 'lucide-react';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +22,7 @@ export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { data: categories } = useCategories();
   const { user, signOut, isAdmin, isEditor } = useAuth();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -30,7 +33,7 @@ export function Header() {
     }
   };
 
-  const currentDate = new Date().toLocaleDateString('ne-NP', {
+  const currentDate = new Date().toLocaleDateString(language === 'ne' ? 'ne-NP' : 'en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -43,33 +46,34 @@ export function Header() {
       <div className="bg-primary text-primary-foreground">
         <div className="news-container py-2 flex items-center justify-between text-sm">
           <span>{currentDate}</span>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary/80 gap-2">
                     <User className="h-4 w-4" />
-                    <span className="hidden sm:inline">प्रयोगकर्ता</span>
+                    <span className="hidden sm:inline">{t.nav.profile}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   {(isAdmin || isEditor) && (
                     <>
                       <DropdownMenuItem asChild>
-                        <Link to="/admin">एडमिन ड्यासबोर्ड</Link>
+                        <Link to="/admin">{t.admin.dashboard}</Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                     </>
                   )}
                   <DropdownMenuItem onClick={signOut} className="text-destructive">
                     <LogOut className="h-4 w-4 mr-2" />
-                    लग आउट
+                    {t.nav.logout}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <Link to="/auth" className="hover:underline">
-                लग इन / साइन अप
+                {t.nav.login}
               </Link>
             )}
           </div>
@@ -94,7 +98,7 @@ export function Header() {
             <div className="relative flex-1">
               <Input
                 type="search"
-                placeholder="समाचार खोज्नुहोस्..."
+                placeholder={t.search.placeholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pr-10"
@@ -128,7 +132,7 @@ export function Header() {
             <div className="relative">
               <Input
                 type="search"
-                placeholder="समाचार खोज्नुहोस्..."
+                placeholder={t.search.placeholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pr-10"
@@ -150,7 +154,7 @@ export function Header() {
               to="/"
               className="px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-secondary rounded transition-colors whitespace-nowrap"
             >
-              गृहपृष्ठ
+              {t.nav.home}
             </Link>
             {categories?.map((category) => (
               <Link
@@ -171,7 +175,7 @@ export function Header() {
                 onClick={() => setIsMenuOpen(false)}
                 className="block px-4 py-3 text-foreground hover:bg-secondary rounded"
               >
-                गृहपृष्ठ
+                {t.nav.home}
               </Link>
               {categories?.map((category) => (
                 <Link
