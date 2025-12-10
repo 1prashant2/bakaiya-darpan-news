@@ -4,15 +4,49 @@ import { useArticle, useArticles } from '@/hooks/useArticles';
 import { ArticleCard } from '@/components/news/ArticleCard';
 import { Sidebar } from '@/components/news/Sidebar';
 import { format } from 'date-fns';
-import { Clock, User, Share2, Facebook, Twitter } from 'lucide-react';
+import { Clock, User, Share2, Facebook, Twitter, Check, Copy } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 
 export default function ArticlePage() {
   const { slug } = useParams<{ slug: string }>();
   const { data: article, isLoading } = useArticle(slug || '');
   const { data: relatedArticles } = useArticles(article?.categories?.slug, 4);
+  const { toast } = useToast();
+  const [copied, setCopied] = useState(false);
 
+  const articleUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const articleTitle = article?.title || '';
+
+  const shareOnFacebook = () => {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`;
+    window.open(url, '_blank', 'width=600,height=400');
+  };
+
+  const shareOnTwitter = () => {
+    const url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(articleUrl)}&text=${encodeURIComponent(articleTitle)}`;
+    window.open(url, '_blank', 'width=600,height=400');
+  };
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(articleUrl);
+      setCopied(true);
+      toast({
+        title: 'लिङ्क कपी भयो',
+        description: 'समाचारको लिङ्क क्लिपबोर्डमा कपी गरियो।',
+      });
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      toast({
+        title: 'त्रुटि',
+        description: 'लिङ्क कपी गर्न सकिएन।',
+        variant: 'destructive',
+      });
+    }
+  };
   if (isLoading) {
     return (
       <Layout>
@@ -63,9 +97,33 @@ export default function ArticlePage() {
                 {format(new Date(article.created_at), 'yyyy-MM-dd HH:mm')}
               </span>
               <div className="flex items-center gap-2 ml-auto">
-                <Button variant="ghost" size="sm"><Facebook className="h-4 w-4" /></Button>
-                <Button variant="ghost" size="sm"><Twitter className="h-4 w-4" /></Button>
-                <Button variant="ghost" size="sm"><Share2 className="h-4 w-4" /></Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={shareOnFacebook}
+                  title="फेसबुकमा शेयर गर्नुहोस्"
+                  className="hover:text-blue-600"
+                >
+                  <Facebook className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={shareOnTwitter}
+                  title="ट्विटरमा शेयर गर्नुहोस्"
+                  className="hover:text-sky-500"
+                >
+                  <Twitter className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={copyLink}
+                  title="लिङ्क कपी गर्नुहोस्"
+                  className="hover:text-green-600"
+                >
+                  {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                </Button>
               </div>
             </div>
 
