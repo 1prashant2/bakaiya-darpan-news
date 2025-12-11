@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ArticleList } from '@/components/admin/ArticleList';
 import { CategoryList } from '@/components/admin/CategoryList';
 import { UserManagement } from '@/components/admin/UserManagement';
+import { SiteSettingsForm } from '@/components/admin/SiteSettingsForm';
 import { Article, Category } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,12 +19,11 @@ import {
   Users, 
   Plus, 
   Eye, 
-  TrendingUp,
   Clock,
   CheckCircle2,
   FileEdit,
   ArrowRight,
-  BarChart3
+  Settings
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -312,6 +312,12 @@ export default function AdminDashboard() {
                     प्रयोगकर्ताहरू
                   </TabsTrigger>
                 )}
+                {isAdmin && (
+                  <TabsTrigger id="settings-tab" value="settings" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    <Settings className="h-4 w-4" />
+                    साइट सेटिङ
+                  </TabsTrigger>
+                )}
               </TabsList>
               
               <TabsContent value="articles" className="mt-4">
@@ -345,6 +351,16 @@ export default function AdminDashboard() {
                   <Card>
                     <CardContent className="p-0">
                       <UserManagement />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              )}
+
+              {isAdmin && (
+                <TabsContent value="settings" className="mt-4">
+                  <Card>
+                    <CardContent className="p-0">
+                      <SiteSettingsForm />
                     </CardContent>
                   </Card>
                 </TabsContent>
