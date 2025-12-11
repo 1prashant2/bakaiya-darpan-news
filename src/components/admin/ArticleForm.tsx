@@ -256,12 +256,12 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
 
           <div className="space-y-2">
             <Label>{t.admin.articleProvince}</Label>
-            <Select value={provinceId} onValueChange={setProvinceId}>
+            <Select value={provinceId || "none"} onValueChange={(val) => setProvinceId(val === "none" ? "" : val)}>
               <SelectTrigger>
                 <SelectValue placeholder={t.admin.selectProvince} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">
+                <SelectItem value="none">
                   {t.admin.allProvinces}
                 </SelectItem>
                 {provinces?.map((province) => (
@@ -276,12 +276,12 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
           {provinceId && (
             <div className="space-y-2">
               <Label>{t.admin.articleDistrict}</Label>
-              <Select value={districtId} onValueChange={setDistrictId}>
+              <Select value={districtId || "none"} onValueChange={(val) => setDistrictId(val === "none" ? "" : val)}>
                 <SelectTrigger>
                   <SelectValue placeholder={t.admin.selectDistrict} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">
+                  <SelectItem value="none">
                     {t.admin.allDistricts}
                   </SelectItem>
                   {districts?.map((district) => (
