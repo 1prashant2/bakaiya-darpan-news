@@ -4,6 +4,7 @@ import { Search, Menu, X, User, LogOut } from 'lucide-react';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -23,6 +24,7 @@ export function Header() {
   const { data: categories } = useCategories();
   const { user, signOut, isAdmin, isEditor } = useAuth();
   const { t, language } = useLanguage();
+  const { settings } = useSiteSettings();
   const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -84,12 +86,12 @@ export function Header() {
       <div className="news-container py-4">
         <div className="flex items-center justify-between gap-4">
           <Link to="/" className="flex-shrink-0 flex items-center gap-3">
-            <img src={logo} alt="प्रेस दर्पण" className="h-12 w-12 sm:h-14 sm:w-14 rounded-full object-cover" />
+            <img src={logo} alt={settings?.site_name || 'सत्य'} className="h-12 w-12 sm:h-14 sm:w-14 rounded-full object-cover" />
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-primary">
-                प्रेस दर्पण
+                {settings?.site_name || 'सत्य'}
               </h1>
-              <p className="text-xs text-muted-foreground">सत्य, निष्पक्ष र भरपर्दो समाचार</p>
+              <p className="text-xs text-muted-foreground">{settings?.site_description || 'सत्यको खोजीमा'}</p>
             </div>
           </Link>
 
