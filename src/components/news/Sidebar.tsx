@@ -2,6 +2,7 @@ import { useTrendingArticles, useRecentArticles } from '@/hooks/useArticles';
 import { ArticleCard } from './ArticleCard';
 import { TrendingUp, Clock, Cloud } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AdDisplay } from '@/components/ads/AdDisplay';
 
 export function Sidebar() {
   const { data: trendingArticles, isLoading: trendingLoading } = useTrendingArticles(5);
@@ -9,6 +10,9 @@ export function Sidebar() {
 
   return (
     <aside className="space-y-6">
+      {/* Sidebar Ad - Top */}
+      <AdDisplay placement="sidebar" className="w-full aspect-[300/250]" />
+
       {/* Trending News */}
       <div className="news-sidebar-widget">
         <div className="flex items-center gap-2 mb-4 pb-2 border-b border-border">
@@ -56,7 +60,7 @@ export function Sidebar() {
         )}
       </div>
 
-      {/* Weather Widget Placeholder */}
+      {/* Weather Widget */}
       <div className="news-sidebar-widget">
         <div className="flex items-center gap-2 mb-4 pb-2 border-b border-border">
           <Cloud className="h-5 w-5 text-primary" />
@@ -69,11 +73,8 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Ad Placeholder */}
-      <div className="news-sidebar-widget bg-secondary/50 text-center py-8">
-        <p className="text-sm text-muted-foreground">विज्ञापन स्थान</p>
-        <p className="text-xs text-muted-foreground">३००×२५०</p>
-      </div>
+      {/* Sidebar Ad - Bottom */}
+      <AdDisplay placement="sidebar" className="w-full aspect-[300/250]" />
     </aside>
   );
 }
