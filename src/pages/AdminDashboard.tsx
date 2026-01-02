@@ -7,6 +7,7 @@ import { ArticleList } from '@/components/admin/ArticleList';
 import { CategoryList } from '@/components/admin/CategoryList';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { SiteSettingsForm } from '@/components/admin/SiteSettingsForm';
+import { AdvertisementManagement } from '@/components/admin/AdvertisementManagement';
 import { Article, Category } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,7 +24,8 @@ import {
   CheckCircle2,
   FileEdit,
   ArrowRight,
-  Settings
+  Settings,
+  Megaphone
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -313,6 +315,12 @@ export default function AdminDashboard() {
                   </TabsTrigger>
                 )}
                 {isAdmin && (
+                  <TabsTrigger id="ads-tab" value="ads" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    <Megaphone className="h-4 w-4" />
+                    विज्ञापन
+                  </TabsTrigger>
+                )}
+                {isAdmin && (
                   <TabsTrigger id="settings-tab" value="settings" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                     <Settings className="h-4 w-4" />
                     साइट सेटिङ
@@ -353,6 +361,12 @@ export default function AdminDashboard() {
                       <UserManagement />
                     </CardContent>
                   </Card>
+                </TabsContent>
+              )}
+
+              {isAdmin && (
+                <TabsContent value="ads" className="mt-4">
+                  <AdvertisementManagement />
                 </TabsContent>
               )}
 

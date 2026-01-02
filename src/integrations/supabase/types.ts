@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      advertisements: {
+        Row: {
+          ad_type: string
+          click_count: number
+          created_at: string
+          description: string | null
+          end_date: string
+          id: string
+          is_active: boolean
+          link_url: string | null
+          media_url: string
+          placement: string
+          priority: number
+          start_date: string
+          title: string
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          ad_type: string
+          click_count?: number
+          created_at?: string
+          description?: string | null
+          end_date: string
+          id?: string
+          is_active?: boolean
+          link_url?: string | null
+          media_url: string
+          placement: string
+          priority?: number
+          start_date?: string
+          title: string
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          ad_type?: string
+          click_count?: number
+          created_at?: string
+          description?: string | null
+          end_date?: string
+          id?: string
+          is_active?: boolean
+          link_url?: string | null
+          media_url?: string
+          placement?: string
+          priority?: number
+          start_date?: string
+          title?: string
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
       articles: {
         Row: {
           author: string
