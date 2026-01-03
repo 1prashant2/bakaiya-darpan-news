@@ -26,9 +26,14 @@ export function useAdvertisements(placement?: string) {
   return useQuery({
     queryKey: ['advertisements', placement],
     queryFn: async () => {
+      const now = new Date().toISOString();
+      
       let query = supabase
         .from('advertisements')
         .select('*')
+        .eq('is_active', true)
+        .lte('start_date', now)
+        .gte('end_date', now)
         .order('priority', { ascending: false })
         .order('created_at', { ascending: false });
       

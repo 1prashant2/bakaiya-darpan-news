@@ -4,7 +4,7 @@ import { useArticle, useArticles } from '@/hooks/useArticles';
 import { ArticleCard } from '@/components/news/ArticleCard';
 import { Sidebar } from '@/components/news/Sidebar';
 import { format } from 'date-fns';
-import { Clock, User, Share2, Facebook, Twitter, Check, Copy } from 'lucide-react';
+import { Clock, User, Share2, Facebook, Twitter, Check, Copy, MessageCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -28,6 +28,27 @@ export default function ArticlePage() {
   const shareOnTwitter = () => {
     const url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(articleUrl)}&text=${encodeURIComponent(articleTitle)}`;
     window.open(url, '_blank', 'width=600,height=400');
+  };
+
+  const shareOnWhatsApp = () => {
+    const url = `https://wa.me/?text=${encodeURIComponent(articleTitle + ' ' + articleUrl)}`;
+    window.open(url, '_blank');
+  };
+
+  const nativeShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: articleTitle,
+          text: article?.excerpt || articleTitle,
+          url: articleUrl,
+        });
+      } catch (err) {
+        // User cancelled or error
+      }
+    } else {
+      copyLink();
+    }
   };
 
   const copyLink = async () => {
@@ -96,13 +117,13 @@ export default function ArticlePage() {
                 <Clock className="h-4 w-4" />
                 {format(new Date(article.created_at), 'yyyy-MM-dd HH:mm')}
               </span>
-              <div className="flex items-center gap-2 ml-auto">
+              <div className="flex items-center gap-1 sm:gap-2 ml-auto flex-wrap">
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   onClick={shareOnFacebook}
                   title="फेसबुकमा शेयर गर्नुहोस्"
-                  className="hover:text-blue-600"
+                  className="hover:text-blue-600 px-2"
                 >
                   <Facebook className="h-4 w-4" />
                 </Button>
@@ -111,16 +132,34 @@ export default function ArticlePage() {
                   size="sm" 
                   onClick={shareOnTwitter}
                   title="ट्विटरमा शेयर गर्नुहोस्"
-                  className="hover:text-sky-500"
+                  className="hover:text-sky-500 px-2"
                 >
                   <Twitter className="h-4 w-4" />
                 </Button>
                 <Button 
                   variant="ghost" 
                   size="sm" 
+                  onClick={shareOnWhatsApp}
+                  title="व्हाट्सएपमा शेयर गर्नुहोस्"
+                  className="hover:text-green-500 px-2"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={nativeShare}
+                  title="शेयर गर्नुहोस्"
+                  className="hover:text-primary px-2"
+                >
+                  <Share2 className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
                   onClick={copyLink}
                   title="लिङ्क कपी गर्नुहोस्"
-                  className="hover:text-green-600"
+                  className="hover:text-green-600 px-2"
                 >
                   {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
                 </Button>
