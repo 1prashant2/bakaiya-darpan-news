@@ -2,6 +2,16 @@ import { Layout } from '@/components/layout/Layout';
 import { FeaturedNews } from '@/components/news/FeaturedNews';
 import { CategorySection } from '@/components/news/CategorySection';
 import { Sidebar } from '@/components/news/Sidebar';
+import { AdDisplay } from '@/components/ads/AdDisplay';
+
+const categories = [
+  { name: 'राष्ट्र', slug: 'rashtra' },
+  { name: 'राजनीति', slug: 'rajniti' },
+  { name: 'व्यवसाय', slug: 'byabasaya' },
+  { name: 'खेलकुद', slug: 'khelkud' },
+  { name: 'मनोरञ्जन', slug: 'manoranjan' },
+  { name: 'सूचना प्रविधि', slug: 'suchana-prawidhi' },
+];
 
 const Index = () => {
   return (
@@ -11,12 +21,25 @@ const Index = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
-            <CategorySection categoryName="राष्ट्र" categorySlug="rashtra" limit={4} />
-            <CategorySection categoryName="राजनीति" categorySlug="rajniti" limit={4} />
-            <CategorySection categoryName="व्यवसाय" categorySlug="byabasaya" limit={4} />
-            <CategorySection categoryName="खेलकुद" categorySlug="khelkud" limit={4} />
-            <CategorySection categoryName="मनोरञ्जन" categorySlug="manoranjan" limit={4} />
-            <CategorySection categoryName="सूचना प्रविधि" categorySlug="suchana-prawidhi" limit={4} />
+            {categories.map((category, index) => (
+              <div key={category.slug}>
+                <CategorySection 
+                  categoryName={category.name} 
+                  categorySlug={category.slug} 
+                  limit={4} 
+                />
+                {/* Show ad after every 2 category sections */}
+                {(index + 1) % 2 === 0 && index < categories.length - 1 && (
+                  <div className="my-8">
+                    <AdDisplay 
+                      placement="between_articles" 
+                      showNavigation 
+                      autoPlayInterval={5000}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
           <Sidebar />
         </div>
