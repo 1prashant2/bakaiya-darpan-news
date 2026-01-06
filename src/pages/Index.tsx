@@ -31,11 +31,7 @@ const Index = () => {
                 {/* Show ad after every 2 category sections */}
                 {(index + 1) % 2 === 0 && index < categories.length - 1 && (
                   <div className="my-8">
-                    <AdDisplay 
-                      placement="between_articles" 
-                      showNavigation 
-                      autoPlayInterval={5000}
-                    />
+                    <AdDisplay placement="between_articles" />
                   </div>
                 )}
               </div>
