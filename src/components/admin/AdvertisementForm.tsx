@@ -31,6 +31,7 @@ const adSchema = z.object({
   ad_type: z.enum(['image', 'video', 'product']),
   link_url: z.string().url('सही URL हाल्नुहोस्').optional().or(z.literal('')),
   placement: z.enum(['header', 'sidebar', 'between_articles', 'footer']),
+  aspect_ratio: z.string(),
   start_date: z.string().min(1, 'सुरु मिति आवश्यक छ'),
   end_date: z.string().min(1, 'अन्त्य मिति आवश्यक छ'),
   is_active: z.boolean(),
@@ -57,6 +58,7 @@ export function AdvertisementForm({ open, onOpenChange, editingAd }: Advertiseme
     defaultValues: {
       ad_type: 'image',
       placement: 'sidebar',
+      aspect_ratio: 'auto',
       is_active: true,
       priority: 1,
       start_date: new Date().toISOString().split('T')[0],
@@ -74,6 +76,7 @@ export function AdvertisementForm({ open, onOpenChange, editingAd }: Advertiseme
         ad_type: editingAd.ad_type,
         link_url: editingAd.link_url || '',
         placement: editingAd.placement,
+        aspect_ratio: editingAd.aspect_ratio || 'auto',
         start_date: editingAd.start_date.split('T')[0],
         end_date: editingAd.end_date.split('T')[0],
         is_active: editingAd.is_active,
@@ -84,6 +87,7 @@ export function AdvertisementForm({ open, onOpenChange, editingAd }: Advertiseme
       reset({
         ad_type: 'image',
         placement: 'sidebar',
+        aspect_ratio: 'auto',
         is_active: true,
         priority: 1,
         start_date: new Date().toISOString().split('T')[0],
@@ -145,6 +149,7 @@ export function AdvertisementForm({ open, onOpenChange, editingAd }: Advertiseme
       media_url: mediaUrl!,
       link_url: data.link_url || null,
       placement: data.placement,
+      aspect_ratio: data.aspect_ratio,
       start_date: new Date(data.start_date).toISOString(),
       end_date: new Date(data.end_date).toISOString(),
       is_active: data.is_active,
@@ -278,10 +283,32 @@ export function AdvertisementForm({ open, onOpenChange, editingAd }: Advertiseme
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="link_url">लिंक URL</Label>
-              <Input id="link_url" {...register('link_url')} placeholder="https://..." />
-              {errors.link_url && <p className="text-sm text-destructive">{errors.link_url.message}</p>}
+              <Label>आस्पेक्ट रेशियो</Label>
+              <Select
+                value={watch('aspect_ratio')}
+                onValueChange={(value) => setValue('aspect_ratio', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="auto">स्वचालित (Auto)</SelectItem>
+                  <SelectItem value="16:9">16:9 (वाइडस्क्रिन)</SelectItem>
+                  <SelectItem value="4:3">4:3 (मानक)</SelectItem>
+                  <SelectItem value="1:1">1:1 (वर्ग)</SelectItem>
+                  <SelectItem value="3:4">3:4 (पोर्ट्रेट)</SelectItem>
+                  <SelectItem value="728:90">728:90 (ब्यानर)</SelectItem>
+                  <SelectItem value="300:250">300:250 (मध्यम आयत)</SelectItem>
+                  <SelectItem value="320:50">320:50 (मोबाइल ब्यानर)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="link_url">लिंक URL</Label>
+            <Input id="link_url" {...register('link_url')} placeholder="https://..." />
+            {errors.link_url && <p className="text-sm text-destructive">{errors.link_url.message}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
