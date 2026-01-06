@@ -17,6 +17,7 @@ export type Database = {
       advertisements: {
         Row: {
           ad_type: string
+          aspect_ratio: string | null
           click_count: number
           created_at: string
           description: string | null
@@ -34,6 +35,7 @@ export type Database = {
         }
         Insert: {
           ad_type: string
+          aspect_ratio?: string | null
           click_count?: number
           created_at?: string
           description?: string | null
@@ -51,6 +53,7 @@ export type Database = {
         }
         Update: {
           ad_type?: string
+          aspect_ratio?: string | null
           click_count?: number
           created_at?: string
           description?: string | null

@@ -10,6 +10,7 @@ export interface Advertisement {
   media_url: string;
   link_url: string | null;
   placement: 'header' | 'sidebar' | 'between_articles' | 'footer';
+  aspect_ratio: string | null;
   start_date: string;
   end_date: string;
   is_active: boolean;

@@ -7,28 +7,29 @@ interface AdDisplayProps {
   className?: string;
 }
 
-// Aspect ratios and sizing based on placement
-const placementConfig = {
-  header: {
-    aspectRatio: 'aspect-[728/90]', // Standard leaderboard banner
-    maxHeight: 'max-h-20 sm:max-h-24',
-    containerClass: 'w-full',
-  },
-  sidebar: {
-    aspectRatio: 'aspect-[300/250]', // Medium rectangle (vertical-ish)
-    maxHeight: 'max-h-64 sm:max-h-72',
-    containerClass: 'w-full',
-  },
-  between_articles: {
-    aspectRatio: 'aspect-[4/1] sm:aspect-[5/1] md:aspect-[6/1]', // Wide banner
-    maxHeight: 'max-h-24 sm:max-h-28',
-    containerClass: 'w-full',
-  },
-  footer: {
-    aspectRatio: 'aspect-[728/90]', // Standard leaderboard banner
-    maxHeight: 'max-h-16 sm:max-h-20',
-    containerClass: 'w-full',
-  },
+// Default aspect ratios based on placement (used when ad has 'auto' or no aspect_ratio)
+const defaultAspectRatios = {
+  header: '728/90',
+  sidebar: '300/250',
+  between_articles: '728/90',
+  footer: '728/90',
+};
+
+// Convert aspect ratio string to CSS aspect-ratio value
+const parseAspectRatio = (ratio: string | null, placement: string): string => {
+  if (!ratio || ratio === 'auto') {
+    return defaultAspectRatios[placement as keyof typeof defaultAspectRatios] || '16/9';
+  }
+  // Convert "16:9" format to "16/9" for CSS
+  return ratio.replace(':', '/');
+};
+
+// Max heights based on placement
+const maxHeights = {
+  header: 'max-h-24',
+  sidebar: 'max-h-72',
+  between_articles: 'max-h-28',
+  footer: 'max-h-20',
 };
 
 export function AdDisplay({ placement, className }: AdDisplayProps) {
@@ -40,7 +41,7 @@ export function AdDisplay({ placement, className }: AdDisplayProps) {
   const activeAds = ads?.filter(ad => ad.is_active) || [];
   const ad = activeAds[0];
 
-  const config = placementConfig[placement];
+  const aspectRatio = ad ? parseAspectRatio(ad.aspect_ratio, placement) : defaultAspectRatios[placement];
 
   useEffect(() => {
     if (ad && !trackedRef.current) {
@@ -57,25 +58,27 @@ export function AdDisplay({ placement, className }: AdDisplayProps) {
 
   if (isLoading) {
     return (
-      <div className={cn(
-        'bg-muted/50 animate-pulse rounded-lg',
-        config.containerClass,
-        config.aspectRatio,
-        config.maxHeight,
-        className
-      )} />
+      <div 
+        className={cn(
+          'bg-muted/50 animate-pulse rounded-lg w-full',
+          maxHeights[placement],
+          className
+        )}
+        style={{ aspectRatio }}
+      />
     );
   }
 
   if (!ad) {
     return (
-      <div className={cn(
-        'bg-secondary/30 rounded-lg flex items-center justify-center text-muted-foreground text-xs sm:text-sm',
-        config.containerClass,
-        config.aspectRatio,
-        config.maxHeight,
-        className
-      )}>
+      <div 
+        className={cn(
+          'bg-secondary/30 rounded-lg flex items-center justify-center text-muted-foreground text-xs sm:text-sm w-full',
+          maxHeights[placement],
+          className
+        )}
+        style={{ aspectRatio }}
+      >
         <span>विज्ञापन स्थान</span>
       </div>
     );
@@ -105,13 +108,14 @@ export function AdDisplay({ placement, className }: AdDisplayProps) {
   };
 
   const content = (
-    <div className={cn(
-      'relative overflow-hidden rounded-lg',
-      config.containerClass,
-      config.aspectRatio,
-      config.maxHeight,
-      className
-    )}>
+    <div 
+      className={cn(
+        'relative overflow-hidden rounded-lg w-full',
+        maxHeights[placement],
+        className
+      )}
+      style={{ aspectRatio }}
+    >
       <AdContent />
       <span className="absolute top-1 right-1 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded">
         विज्ञापन
