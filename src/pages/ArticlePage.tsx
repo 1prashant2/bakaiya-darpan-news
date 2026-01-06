@@ -4,7 +4,7 @@ import { useArticle, useArticles } from '@/hooks/useArticles';
 import { ArticleCard } from '@/components/news/ArticleCard';
 import { Sidebar } from '@/components/news/Sidebar';
 import { format } from 'date-fns';
-import { Clock, User, Share2, Facebook, Twitter, Check, Copy, MessageCircle } from 'lucide-react';
+import { Clock, User, Share2, Facebook, Twitter, Check, Copy, MessageCircle, Instagram } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -33,6 +33,39 @@ export default function ArticlePage() {
   const shareOnWhatsApp = () => {
     const url = `https://wa.me/?text=${encodeURIComponent(articleTitle + ' ' + articleUrl)}`;
     window.open(url, '_blank');
+  };
+
+  const shareToInstagram = async () => {
+    // Instagram doesn't have a direct web share API
+    // On mobile, we use the native share with files capability
+    if (navigator.share && article?.image_url) {
+      try {
+        // Fetch the image and convert to blob for sharing
+        const response = await fetch(article.image_url);
+        const blob = await response.blob();
+        const file = new File([blob], 'article-image.jpg', { type: blob.type });
+        
+        await navigator.share({
+          title: articleTitle,
+          text: `${articleTitle}\n\n${article?.excerpt || ''}\n\n${articleUrl}`,
+          files: [file],
+        });
+      } catch (err) {
+        // Fallback: copy link and show instructions
+        await navigator.clipboard.writeText(`${articleTitle}\n${articleUrl}`);
+        toast({
+          title: 'इन्स्टाग्राममा शेयर गर्नुहोस्',
+          description: 'लिङ्क कपी भयो। इन्स्टाग्राम खोल्नुहोस् र स्टोरीमा पेस्ट गर्नुहोस्।',
+        });
+      }
+    } else {
+      // Desktop fallback: copy link
+      await navigator.clipboard.writeText(`${articleTitle}\n${articleUrl}`);
+      toast({
+        title: 'इन्स्टाग्राममा शेयर गर्नुहोस्',
+        description: 'लिङ्क कपी भयो। मोबाइलबाट इन्स्टाग्राम स्टोरीमा शेयर गर्न सकिन्छ।',
+      });
+    }
   };
 
   const nativeShare = async () => {
@@ -144,6 +177,15 @@ export default function ArticlePage() {
                   className="hover:text-green-500 px-2"
                 >
                   <MessageCircle className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={shareToInstagram}
+                  title="इन्स्टाग्राममा शेयर गर्नुहोस्"
+                  className="hover:text-pink-500 px-2"
+                >
+                  <Instagram className="h-4 w-4" />
                 </Button>
                 <Button 
                   variant="ghost" 
