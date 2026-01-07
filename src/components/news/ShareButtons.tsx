@@ -26,10 +26,13 @@ export function ShareButtons({
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
 
-  const trackShare = async (platform: string) => {
+  const trackShare = async (_platform: string) => {
     try {
-      // Increment view_count as a proxy for engagement (or you can add a share_count column)
-      await supabase.rpc('increment_share_count', { article_id: articleId, platform });
+      // Track share by incrementing view_count
+      await supabase
+        .from('articles')
+        .update({ view_count: (await supabase.from('articles').select('view_count').eq('id', articleId).single()).data?.view_count || 0 + 1 })
+        .eq('id', articleId);
     } catch (error) {
       console.log('Share tracking error:', error);
     }

@@ -308,6 +308,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_share_count: {
+        Args: { article_id: string; platform: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "editor" | "reader" | "super_admin" | "author"
