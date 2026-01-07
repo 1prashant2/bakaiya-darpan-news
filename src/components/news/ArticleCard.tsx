@@ -2,13 +2,19 @@ import { Link } from 'react-router-dom';
 import { Article } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
 import { Clock, User } from 'lucide-react';
+import { ShareButtons } from './ShareButtons';
 
 interface ArticleCardProps {
   article: Article;
   variant?: 'default' | 'horizontal' | 'compact';
+  showShare?: boolean;
 }
 
-export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) {
+export function ArticleCard({ article, variant = 'default', showShare = true }: ArticleCardProps) {
+  const articleUrl = typeof window !== 'undefined' 
+    ? `${window.location.origin}/article/${article.slug}` 
+    : `/article/${article.slug}`;
+
   if (variant === 'horizontal') {
     return (
       <Link
@@ -93,6 +99,17 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
             {formatDistanceToNow(new Date(article.created_at), { addSuffix: true })}
           </span>
         </div>
+        {showShare && (
+          <ShareButtons
+            articleId={article.id}
+            articleTitle={article.title}
+            articleUrl={articleUrl}
+            articleExcerpt={article.excerpt || undefined}
+            articleImageUrl={article.image_url || undefined}
+            size="sm"
+            className="mt-2 pt-2 border-t border-border justify-center"
+          />
+        )}
       </div>
     </Link>
   );
