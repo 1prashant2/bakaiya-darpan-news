@@ -20,6 +20,7 @@ import {
 import { RichTextEditor } from './RichTextEditor';
 import { ImageUpload } from './ImageUpload';
 import { AINewsGenerator } from './AINewsGenerator';
+import { HeadlineSuggestions } from './HeadlineSuggestions';
 import { Loader2, Save, ArrowLeft } from 'lucide-react';
 import { Article } from '@/lib/types';
 
@@ -186,7 +187,14 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="title">{t.admin.articleTitle} *</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="title">{t.admin.articleTitle} *</Label>
+              <HeadlineSuggestions
+                content={content || excerpt}
+                currentTitle={title}
+                onSelect={setTitle}
+              />
+            </div>
             <Input
               id="title"
               value={title}
