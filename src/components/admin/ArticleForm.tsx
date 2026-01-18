@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import { RichTextEditor } from './RichTextEditor';
 import { ImageUpload } from './ImageUpload';
+import { AINewsGenerator } from './AINewsGenerator';
 import { Loader2, Save, ArrowLeft } from 'lucide-react';
 import { Article } from '@/lib/types';
 
@@ -136,6 +137,12 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
     }
   };
 
+  const handleAIGenerated = (news: { title: string; excerpt: string; content: string }) => {
+    setTitle(news.title);
+    setExcerpt(news.excerpt);
+    setContent(news.content);
+  };
+
   const getCategoryName = (category: { name: string; name_en?: string | null }) => {
     return language === 'en' && category.name_en ? category.name_en : category.name;
   };
@@ -146,7 +153,7 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <Button
           type="button"
           variant="ghost"
@@ -155,19 +162,24 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
           <ArrowLeft className="h-4 w-4 mr-2" />
           {t.common.back}
         </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              {t.common.loading}
-            </>
-          ) : (
-            <>
-              <Save className="h-4 w-4 mr-2" />
-              {isEditing ? t.common.save : t.common.submit}
-            </>
+        <div className="flex items-center gap-2">
+          {!isEditing && (
+            <AINewsGenerator onGenerated={handleAIGenerated} />
           )}
-        </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                {t.common.loading}
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                {isEditing ? t.common.save : t.common.submit}
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
