@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -18,7 +18,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Sparkles, Newspaper, Zap, Video } from 'lucide-react';
+import { Loader2, Sparkles, Newspaper, Zap, Video, Upload, X, Image as ImageIcon, ScanSearch } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface GeneratedNews {
@@ -58,7 +58,92 @@ export function AINewsGenerator({ onGenerated }: AINewsGeneratorProps) {
   const [newsType, setNewsType] = useState('सामान्य');
   const [generateType, setGenerateType] = useState('full');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: 'त्रुटि',
+        description: 'कृपया छवि फाइल मात्र अपलोड गर्नुहोस्',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'त्रुटि',
+        description: 'फाइल साइज ५MB भन्दा कम हुनुपर्छ',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      setUploadedImage(base64);
+      setImagePreview(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const analyzeImage = async () => {
+    if (!uploadedImage) return;
+
+    setIsAnalyzing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-news', {
+        body: {
+          action: 'analyze_image',
+          imageBase64: uploadedImage,
+        },
+      });
+
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+
+      // Build description from analysis
+      let analysisText = data.description || '';
+      if (data.location) analysisText += `\nठाउँ: ${data.location}`;
+      if (data.event_type) analysisText += `\nघटनाको प्रकार: ${data.event_type}`;
+      if (data.notable_elements?.length) {
+        analysisText += `\nमुख्य तत्वहरू: ${data.notable_elements.join(', ')}`;
+      }
+      if (data.news_angle) analysisText += `\nसम्भावित समाचार कोण: ${data.news_angle}`;
+
+      setImageDescription(analysisText);
+
+      toast({
+        title: 'सफलता',
+        description: 'फोटो विश्लेषण सम्पन्न!',
+      });
+    } catch (error: any) {
+      console.error('Error analyzing image:', error);
+      toast({
+        title: 'त्रुटि',
+        description: error.message || 'फोटो विश्लेषण गर्न सकिएन',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const removeImage = () => {
+    setUploadedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleGenerate = async () => {
     if (!description.trim() && !imageDescription.trim()) {
@@ -82,13 +167,8 @@ export function AINewsGenerator({ onGenerated }: AINewsGeneratorProps) {
         },
       });
 
-      if (error) {
-        throw error;
-      }
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
 
       onGenerated({
         title: data.title || '',
@@ -104,6 +184,7 @@ export function AINewsGenerator({ onGenerated }: AINewsGeneratorProps) {
       setIsOpen(false);
       setDescription('');
       setImageDescription('');
+      removeImage();
     } catch (error: any) {
       console.error('Error generating news:', error);
       toast({
@@ -131,7 +212,7 @@ export function AINewsGenerator({ onGenerated }: AINewsGeneratorProps) {
             AI समाचार जेनरेटर
           </DialogTitle>
           <DialogDescription>
-            फोटो/भिडियोको विवरण वा छोटो नोटबाट पूर्ण नेपाली समाचार तयार गर्नुहोस्
+            फोटो अपलोड गर्नुहोस् वा विवरण लेख्नुहोस्, AI ले पूर्ण नेपाली समाचार तयार गर्छ
           </DialogDescription>
         </DialogHeader>
 
@@ -181,6 +262,67 @@ export function AINewsGenerator({ onGenerated }: AINewsGeneratorProps) {
             </Select>
           </div>
 
+          {/* Image Upload */}
+          <div className="space-y-2">
+            <Label>फोटो अपलोड गर्नुहोस्</Label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+            
+            {imagePreview ? (
+              <div className="relative">
+                <img
+                  src={imagePreview}
+                  alt="Uploaded preview"
+                  className="w-full h-48 object-cover rounded-lg border border-border"
+                />
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    onClick={analyzeImage}
+                    disabled={isAnalyzing}
+                    className="gap-1"
+                  >
+                    {isAnalyzing ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <ScanSearch className="h-3 w-3" />
+                    )}
+                    विश्लेषण
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="destructive"
+                    onClick={removeImage}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full h-32 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center gap-2 hover:border-primary/50 transition-colors"
+              >
+                <Upload className="h-8 w-8 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
+                  फोटो छान्नुहोस् वा यहाँ ड्र्याग गर्नुहोस्
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  अधिकतम ५MB
+                </span>
+              </button>
+            )}
+          </div>
+
           {/* Image/Video Description */}
           <div className="space-y-2">
             <Label htmlFor="imageDesc">फोटो/भिडियोको विवरण</Label>
@@ -192,7 +334,9 @@ export function AINewsGenerator({ onGenerated }: AINewsGeneratorProps) {
               rows={3}
             />
             <p className="text-xs text-muted-foreground">
-              फोटो वा भिडियोमा के देखिन्छ, ठाउँ, समय, व्यक्तिहरू आदि उल्लेख गर्नुहोस्
+              {uploadedImage
+                ? 'AI विश्लेषण बटन थिचेर स्वचालित विवरण प्राप्त गर्नुहोस्'
+                : 'फोटो वा भिडियोमा के देखिन्छ, ठाउँ, समय, व्यक्तिहरू आदि उल्लेख गर्नुहोस्'}
             </p>
           </div>
 
@@ -215,9 +359,9 @@ export function AINewsGenerator({ onGenerated }: AINewsGeneratorProps) {
           <div className="bg-muted/50 rounded-lg p-3 space-y-1">
             <p className="text-sm font-medium">💡 राम्रो नतिजाका लागि:</p>
             <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+              <li>फोटो अपलोड गरेर "विश्लेषण" बटन थिच्नुहोस्</li>
               <li>ठाउँ, मिति, समय स्पष्ट लेख्नुहोस्</li>
               <li>मुख्य व्यक्ति/संस्थाको नाम उल्लेख गर्नुहोस्</li>
-              <li>के भयो र कसरी भयो संक्षेपमा बताउनुहोस्</li>
             </ul>
           </div>
 
