@@ -84,6 +84,7 @@ export type Database = {
           is_featured: boolean | null
           is_published: boolean | null
           province_id: string | null
+          scheduled_at: string | null
           slug: string
           title: string
           updated_at: string | null
@@ -101,6 +102,7 @@ export type Database = {
           is_featured?: boolean | null
           is_published?: boolean | null
           province_id?: string | null
+          scheduled_at?: string | null
           slug: string
           title: string
           updated_at?: string | null
@@ -118,6 +120,7 @@ export type Database = {
           is_featured?: boolean | null
           is_published?: boolean | null
           province_id?: string | null
+          scheduled_at?: string | null
           slug?: string
           title?: string
           updated_at?: string | null

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useCategories } from '@/hooks/useCategories';
 import { useProvinces, useDistricts } from '@/hooks/useLocations';
@@ -10,6 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -23,7 +26,8 @@ import { AINewsGenerator } from './AINewsGenerator';
 import { HeadlineSuggestions } from './HeadlineSuggestions';
 import { SocialMediaGenerator } from './SocialMediaGenerator';
 import { SEOSuggestions } from './SEOSuggestions';
-import { Loader2, Save, ArrowLeft } from 'lucide-react';
+import { Loader2, Save, ArrowLeft, CalendarIcon, Clock, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Article } from '@/lib/types';
 
 interface ArticleFormProps {
@@ -43,6 +47,12 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
   const [imageUrl, setImageUrl] = useState(article?.image_url || '');
   const [isPublished, setIsPublished] = useState(article?.is_published || false);
   const [isFeatured, setIsFeatured] = useState(article?.is_featured || false);
+  const [scheduledAt, setScheduledAt] = useState<Date | undefined>(
+    (article as any)?.scheduled_at ? new Date((article as any).scheduled_at) : undefined
+  );
+  const [scheduledTime, setScheduledTime] = useState(
+    (article as any)?.scheduled_at ? format(new Date((article as any).scheduled_at), 'HH:mm') : '08:00'
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: categories } = useCategories();
@@ -87,6 +97,15 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
     setIsSubmitting(true);
 
     try {
+      // Build scheduled datetime
+      let scheduledDateTime: string | null = null;
+      if (scheduledAt && !isPublished) {
+        const [hours, minutes] = scheduledTime.split(':').map(Number);
+        const dt = new Date(scheduledAt);
+        dt.setHours(hours, minutes, 0, 0);
+        scheduledDateTime = dt.toISOString();
+      }
+
       const articleData = {
         title: title.trim(),
         slug: slug.trim() || `article-${Date.now()}`,
@@ -99,6 +118,7 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
         image_url: imageUrl || null,
         is_published: isPublished,
         is_featured: isFeatured,
+        scheduled_at: scheduledDateTime,
         updated_at: new Date().toISOString(),
       };
 
@@ -264,6 +284,74 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
                 onCheckedChange={setIsFeatured}
               />
             </div>
+
+            {/* Scheduling */}
+            {!isPublished && (
+              <div className="space-y-3 pt-3 border-t border-border">
+                <div className="flex items-center justify-between">
+                  <Label className="flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5" />
+                    शेड्युल गर्नुहोस्
+                  </Label>
+                  {scheduledAt && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setScheduledAt(undefined)}
+                      className="h-6 w-6 p-0"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal text-sm",
+                        !scheduledAt && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {scheduledAt ? format(scheduledAt, "yyyy-MM-dd") : "मिति छान्नुहोस्"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={scheduledAt}
+                      onSelect={setScheduledAt}
+                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                {scheduledAt && (
+                  <div className="space-y-1">
+                    <Label htmlFor="scheduled-time" className="text-xs">समय</Label>
+                    <Input
+                      id="scheduled-time"
+                      type="time"
+                      value={scheduledTime}
+                      onChange={(e) => setScheduledTime(e.target.value)}
+                      className="text-sm"
+                    />
+                  </div>
+                )}
+
+                {scheduledAt && (
+                  <p className="text-xs text-muted-foreground bg-muted/50 rounded-md p-2">
+                    📅 यो समाचार <span className="font-medium">{format(scheduledAt, "yyyy-MM-dd")}</span> को <span className="font-medium">{scheduledTime}</span> मा स्वचालित रूपमा प्रकाशित हुनेछ।
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
