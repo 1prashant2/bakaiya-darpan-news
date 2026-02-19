@@ -18,6 +18,115 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // Handle social media post generation
+    if (action === "social_media_posts") {
+      console.log("Generating social media posts...");
+      const socialResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [
+            {
+              role: "system",
+              content: `तिमी एक सोशल मिडिया विशेषज्ञ हौ। दिइएको समाचार सामग्रीबाट Facebook, Twitter (X), र Instagram का लागि फरक-फरक पोस्ट तयार गर।
+
+नियमहरू:
+- Facebook: ३-४ वाक्यको विस्तृत पोस्ट, इमोजी सहित, हैशट्याग सहित
+- Twitter: २८० अक्षरभित्रको संक्षिप्त ट्वीट, हैशट्याग सहित
+- Instagram: क्याप्शन शैलीमा, इमोजी र हैशट्याग धेरै प्रयोग गर
+
+JSON फर्म्याटमा उत्तर दिनुपर्छ:
+{
+  "facebook": "फेसबुक पोस्ट",
+  "twitter": "ट्विटर पोस्ट",
+  "instagram": "इन्स्टाग्राम क्याप्शन"
+}`
+            },
+            {
+              role: "user",
+              content: `शीर्षक: ${description}\n\nसामग्री: ${imageDescription || ''}\n\nयस समाचारका लागि तीन प्लेटफर्मका पोस्ट JSON मा दिनुहोस्।`
+            }
+          ],
+          response_format: { type: "json_object" },
+        }),
+      });
+
+      if (!socialResponse.ok) {
+        const errorText = await socialResponse.text();
+        console.error("Social media AI error:", socialResponse.status, errorText);
+        throw new Error("सोशल मिडिया पोस्ट तयार गर्न सकिएन");
+      }
+
+      const socialData = await socialResponse.json();
+      const socialContent = socialData.choices?.[0]?.message?.content;
+      const socialPosts = JSON.parse(socialContent);
+
+      return new Response(JSON.stringify(socialPosts), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Handle SEO optimization suggestions
+    if (action === "seo_suggestions") {
+      console.log("Generating SEO suggestions...");
+      const seoResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [
+            {
+              role: "system",
+              content: `तिमी एक SEO विशेषज्ञ हौ। दिइएको नेपाली समाचार सामग्रीको SEO विश्लेषण गर।
+
+JSON फर्म्याटमा उत्तर दिनुपर्छ:
+{
+  "meta_description": "१५०-१६० अक्षरको मेटा विवरण",
+  "keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
+  "readability_score": 85,
+  "readability_label": "राम्रो/मध्यम/कमजोर",
+  "suggestions": [
+    "सुझाव १",
+    "सुझाव २",
+    "सुझाव ३"
+  ],
+  "title_score": 80,
+  "title_suggestions": "शीर्षकका लागि सुझाव",
+  "word_count": 250,
+  "estimated_read_time": "२ मिनेट"
+}`
+            },
+            {
+              role: "user",
+              content: `शीर्षक: ${description}\n\nसामग्री: ${imageDescription || ''}\n\nयस समाचारको SEO विश्लेषण JSON मा दिनुहोस्।`
+            }
+          ],
+          response_format: { type: "json_object" },
+        }),
+      });
+
+      if (!seoResponse.ok) {
+        const errorText = await seoResponse.text();
+        console.error("SEO AI error:", seoResponse.status, errorText);
+        throw new Error("SEO सुझाव तयार गर्न सकिएन");
+      }
+
+      const seoData = await seoResponse.json();
+      const seoContent = seoData.choices?.[0]?.message?.content;
+      const seoSuggestions = JSON.parse(seoContent);
+
+      return new Response(JSON.stringify(seoSuggestions), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Handle headline suggestions
     if (action === "suggest_headlines") {
       console.log("Generating headline suggestions...");
