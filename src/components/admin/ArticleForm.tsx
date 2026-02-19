@@ -21,6 +21,8 @@ import { RichTextEditor } from './RichTextEditor';
 import { ImageUpload } from './ImageUpload';
 import { AINewsGenerator } from './AINewsGenerator';
 import { HeadlineSuggestions } from './HeadlineSuggestions';
+import { SocialMediaGenerator } from './SocialMediaGenerator';
+import { SEOSuggestions } from './SEOSuggestions';
 import { Loader2, Save, ArrowLeft } from 'lucide-react';
 import { Article } from '@/lib/types';
 
@@ -223,7 +225,13 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="excerpt">{t.admin.articleExcerpt}</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="excerpt">{t.admin.articleExcerpt}</Label>
+              <div className="flex items-center gap-1">
+                <SocialMediaGenerator title={title} content={content || excerpt} />
+                <SEOSuggestions title={title} content={content || excerpt} onMetaDescriptionSelect={setExcerpt} />
+              </div>
+            </div>
             <Textarea
               id="excerpt"
               value={excerpt}
