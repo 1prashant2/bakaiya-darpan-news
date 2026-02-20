@@ -1,8 +1,10 @@
+import { useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { FeaturedNews } from '@/components/news/FeaturedNews';
 import { CategorySection } from '@/components/news/CategorySection';
 import { Sidebar } from '@/components/news/Sidebar';
 import { AdDisplay } from '@/components/ads/AdDisplay';
+import { supabase } from '@/integrations/supabase/client';
 
 const categories = [
   { name: 'राष्ट्र', slug: 'rashtra' },
@@ -14,6 +16,11 @@ const categories = [
 ];
 
 const Index = () => {
+  // Trigger scheduled article publishing on page load
+  useEffect(() => {
+    supabase.functions.invoke('publish-scheduled').catch(() => {});
+  }, []);
+
   return (
     <Layout>
       <div className="news-container py-6">
