@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -30,6 +31,29 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 
 export default function AdminDashboard() {
+  const { toast } = useToast();
+  const [publishingScheduled, setPublishingScheduled] = useState(false);
+
+  const handlePublishScheduled = async () => {
+    setPublishingScheduled(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('publish-scheduled');
+      if (error) throw error;
+      const published = data?.published || 0;
+      toast({
+        title: published > 0 ? 'सफलता' : 'कुनै शेड्युल समाचार छैन',
+        description: published > 0 
+          ? `${published} शेड्युल समाचार प्रकाशित भयो` 
+          : 'प्रकाशन गर्नुपर्ने शेड्युल समाचार फेला परेन',
+      });
+      if (published > 0) refetch();
+    } catch (error: any) {
+      toast({ title: 'त्रुटि', description: error.message, variant: 'destructive' });
+    } finally {
+      setPublishingScheduled(false);
+    }
+  };
+
   const { user, isAdmin, isEditor, canManageCategories, canManageUsers, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -141,6 +165,15 @@ export default function AdminDashboard() {
               <Plus className="h-4 w-4" />
               नयाँ समाचार
             </Link>
+          </Button>
+          <Button 
+            variant="outline" 
+            className="gap-2" 
+            onClick={handlePublishScheduled}
+            disabled={publishingScheduled}
+          >
+            <Clock className="h-4 w-4" />
+            {publishingScheduled ? 'प्रकाशन गर्दै...' : 'शेड्युल प्रकाशित गर्नुहोस्'}
           </Button>
           {canManageCategories && (
             <Button variant="outline" className="gap-2" onClick={() => document.getElementById('categories-tab')?.click()}>
