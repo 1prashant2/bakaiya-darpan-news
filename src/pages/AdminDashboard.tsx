@@ -46,7 +46,7 @@ export default function AdminDashboard() {
           ? `${published} शेड्युल समाचार प्रकाशित भयो` 
           : 'प्रकाशन गर्नुपर्ने शेड्युल समाचार फेला परेन',
       });
-      if (published > 0) refetch();
+      if (published > 0) { refetch(); refetchScheduled(); }
     } catch (error: any) {
       toast({ title: 'त्रुटि', description: error.message, variant: 'destructive' });
     } finally {
@@ -92,6 +92,20 @@ export default function AdminDashboard() {
       return data as Category[];
     },
     enabled: !!user && isAdmin,
+  });
+
+  const { data: scheduledCount = 0, refetch: refetchScheduled } = useQuery({
+    queryKey: ['scheduled-articles-count'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('articles')
+        .select('id', { count: 'exact', head: true })
+        .eq('is_published', false)
+        .not('scheduled_at', 'is', null);
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: !!user && (isAdmin || isEditor),
   });
 
   const { data: stats } = useQuery({
@@ -174,6 +188,11 @@ export default function AdminDashboard() {
           >
             <Clock className="h-4 w-4" />
             {publishingScheduled ? 'प्रकाशन गर्दै...' : 'शेड्युल प्रकाशित गर्नुहोस्'}
+            {scheduledCount > 0 && (
+              <Badge variant="destructive" className="ml-1 text-xs px-1.5 py-0.5 min-w-[1.25rem] h-5">
+                {scheduledCount}
+              </Badge>
+            )}
           </Button>
           {canManageCategories && (
             <Button variant="outline" className="gap-2" onClick={() => document.getElementById('categories-tab')?.click()}>
