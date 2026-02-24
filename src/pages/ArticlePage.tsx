@@ -4,7 +4,7 @@ import { useArticle, useArticles } from '@/hooks/useArticles';
 import { ArticleCard } from '@/components/news/ArticleCard';
 import { Sidebar } from '@/components/news/Sidebar';
 import { format } from 'date-fns';
-import { Clock, User, Share2, Facebook, Twitter, Check, Copy, MessageCircle, Instagram } from 'lucide-react';
+import { Clock, User, Share2, Facebook, Twitter, Check, Copy, MessageCircle, Instagram, BookOpen } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -19,6 +19,11 @@ export default function ArticlePage() {
 
   const articleUrl = typeof window !== 'undefined' ? window.location.href : '';
   const articleTitle = article?.title || '';
+
+  // Calculate reading time (average 200 words per minute for Nepali text)
+  const readingTime = article?.content
+    ? Math.max(1, Math.ceil(article.content.split(/\s+/).length / 200))
+    : 0;
 
   const shareOnFacebook = () => {
     const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`;
@@ -137,7 +142,7 @@ export default function ArticlePage() {
               </Link>
             )}
             
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight mb-4">
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-foreground leading-snug mb-4 tracking-tight">
               {article.title}
             </h1>
             
@@ -150,6 +155,12 @@ export default function ArticlePage() {
                 <Clock className="h-4 w-4" />
                 {format(new Date(article.created_at), 'yyyy-MM-dd HH:mm')}
               </span>
+              {readingTime > 0 && (
+                <span className="flex items-center gap-1">
+                  <BookOpen className="h-4 w-4" />
+                  {readingTime} मिनेट पढ्ने समय
+                </span>
+              )}
               <div className="flex items-center gap-1 sm:gap-2 ml-auto flex-wrap">
                 <Button 
                   variant="ghost" 
@@ -212,8 +223,10 @@ export default function ArticlePage() {
               <img src={article.image_url} alt={article.title} className="w-full rounded-md mb-6" />
             )}
 
-            <div className="prose prose-lg max-w-none text-foreground leading-relaxed">
-              {article.content.split('\n').map((p, i) => <p key={i} className="mb-4">{p}</p>)}
+            <div className="prose prose-lg max-w-none text-foreground leading-[1.9] text-[1.05rem] sm:text-lg">
+              {article.content.split('\n').map((p, i) => (
+                <p key={i} className="mb-5">{p}</p>
+              ))}
             </div>
 
             {relatedArticles && relatedArticles.length > 1 && (

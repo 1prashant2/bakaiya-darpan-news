@@ -36,6 +36,7 @@ export interface Article {
   district_id: string | null;
   is_published: boolean;
   is_featured: boolean;
+  is_breaking?: boolean;
   view_count: number;
   created_at: string;
   updated_at: string;

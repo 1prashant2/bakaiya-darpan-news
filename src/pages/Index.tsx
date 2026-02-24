@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { FeaturedNews } from '@/components/news/FeaturedNews';
+import { BreakingNewsTicker } from '@/components/news/BreakingNewsTicker';
 import { CategorySection } from '@/components/news/CategorySection';
 import { Sidebar } from '@/components/news/Sidebar';
 import { AdDisplay } from '@/components/ads/AdDisplay';
@@ -23,6 +24,7 @@ const Index = () => {
 
   return (
     <Layout>
+      <BreakingNewsTicker />
       <div className="news-container py-6">
         <FeaturedNews />
         
