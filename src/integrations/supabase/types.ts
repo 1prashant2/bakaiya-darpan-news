@@ -81,6 +81,7 @@ export type Database = {
           excerpt: string | null
           id: string
           image_url: string | null
+          is_breaking: boolean | null
           is_featured: boolean | null
           is_published: boolean | null
           province_id: string | null
@@ -99,6 +100,7 @@ export type Database = {
           excerpt?: string | null
           id?: string
           image_url?: string | null
+          is_breaking?: boolean | null
           is_featured?: boolean | null
           is_published?: boolean | null
           province_id?: string | null
@@ -117,6 +119,7 @@ export type Database = {
           excerpt?: string | null
           id?: string
           image_url?: string | null
+          is_breaking?: boolean | null
           is_featured?: boolean | null
           is_published?: boolean | null
           province_id?: string | null

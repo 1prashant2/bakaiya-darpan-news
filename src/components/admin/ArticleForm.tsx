@@ -47,6 +47,7 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
   const [imageUrl, setImageUrl] = useState(article?.image_url || '');
   const [isPublished, setIsPublished] = useState(article?.is_published || false);
   const [isFeatured, setIsFeatured] = useState(article?.is_featured || false);
+  const [isBreaking, setIsBreaking] = useState((article as any)?.is_breaking || false);
   const [scheduledAt, setScheduledAt] = useState<Date | undefined>(
     (article as any)?.scheduled_at ? new Date((article as any).scheduled_at) : undefined
   );
@@ -118,6 +119,7 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
         image_url: imageUrl || null,
         is_published: isPublished,
         is_featured: isFeatured,
+        is_breaking: isBreaking,
         scheduled_at: scheduledDateTime,
         updated_at: new Date().toISOString(),
       };
@@ -282,6 +284,17 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
                 id="is-featured"
                 checked={isFeatured}
                 onCheckedChange={setIsFeatured}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label htmlFor="is-breaking" className="flex items-center gap-1.5 text-destructive">
+                ब्रेकिङ न्युज
+              </Label>
+              <Switch
+                id="is-breaking"
+                checked={isBreaking}
+                onCheckedChange={setIsBreaking}
               />
             </div>
 
