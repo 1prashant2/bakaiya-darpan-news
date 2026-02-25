@@ -29,11 +29,11 @@ export function FeaturedNews() {
 
   return (
     <section className="mb-8 animate-fade-in">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Main featured article */}
         <Link
           to={`/article/${mainArticle.slug}`}
-          className="lg:col-span-2 group relative overflow-hidden rounded-md"
+          className="md:col-span-2 lg:col-span-2 group relative overflow-hidden rounded-md"
         >
           <div className="aspect-news-featured overflow-hidden">
             <img

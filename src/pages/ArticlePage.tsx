@@ -133,16 +133,16 @@ export default function ArticlePage() {
 
   return (
     <Layout>
-      <article className="news-container py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
+      <article className="news-container py-4 sm:py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="lg:col-span-2 max-w-prose lg:max-w-none">
             {article.categories && (
               <Link to={`/category/${article.categories.slug}`} className="news-category-badge mb-3 inline-block">
                 {article.categories.name}
               </Link>
             )}
             
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-foreground leading-snug mb-4 tracking-tight">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-foreground leading-snug mb-3 sm:mb-4 tracking-tight">
               {article.title}
             </h1>
             
@@ -220,10 +220,10 @@ export default function ArticlePage() {
             </div>
 
             {article.image_url && (
-              <img src={article.image_url} alt={article.title} className="w-full rounded-md mb-6" />
+              <img src={article.image_url} alt={article.title} className="w-full aspect-video object-cover rounded-md mb-4 sm:mb-6" loading="lazy" />
             )}
 
-            <div className="prose prose-lg max-w-none text-foreground leading-[1.9] text-[1.05rem] sm:text-lg">
+            <div className="prose prose-lg max-w-none text-foreground leading-[1.8] sm:leading-[1.9] text-base sm:text-[1.05rem] md:text-lg">
               {article.content.split('\n').map((p, i) => (
                 <p key={i} className="mb-5">{p}</p>
               ))}

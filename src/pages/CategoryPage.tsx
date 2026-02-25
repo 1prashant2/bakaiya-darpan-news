@@ -13,12 +13,12 @@ export default function CategoryPage() {
 
   return (
     <Layout>
-      <div className="news-container py-6">
-        <h1 className="text-2xl font-bold text-foreground border-l-4 border-primary pl-3 mb-6">
+      <div className="news-container py-4 sm:py-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground border-l-4 border-primary pl-3 mb-4 sm:mb-6">
           {category?.name || 'श्रेणी'}
         </h1>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           <div className="lg:col-span-2">
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

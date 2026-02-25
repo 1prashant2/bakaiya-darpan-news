@@ -38,17 +38,17 @@ export function BreakingNewsTicker() {
 
   return (
     <div className="bg-primary text-primary-foreground">
-      <div className="news-container flex items-center gap-3 py-2">
-        <div className="flex items-center gap-1.5 flex-shrink-0 bg-primary-foreground/20 px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wide animate-pulse">
-          <AlertTriangle className="h-3.5 w-3.5" />
+      <div className="news-container flex items-center gap-2 sm:gap-3 py-2">
+        <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0 bg-primary-foreground/20 px-2 sm:px-2.5 py-1 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wide animate-pulse">
+          <AlertTriangle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
           <span>ब्रेकिङ</span>
         </div>
-        <div className="overflow-hidden flex-1 relative h-6">
+        <div className="overflow-hidden flex-1 relative h-5 sm:h-6">
           {breakingArticles.map((article, index) => (
             <Link
               key={article.id}
               to={`/article/${article.slug}`}
-              className={`absolute inset-0 flex items-center text-sm font-medium hover:underline transition-all duration-500 ${
+              className={`absolute inset-0 flex items-center text-xs sm:text-sm font-medium hover:underline transition-all duration-500 line-clamp-1 ${
                 index === currentIndex
                   ? 'opacity-100 translate-y-0'
                   : 'opacity-0 translate-y-4'

@@ -149,15 +149,15 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-muted/30">
       {/* Header */}
       <header className="bg-card border-b border-border sticky top-0 z-50 shadow-sm">
-        <div className="news-container py-4">
-          <div className="flex items-center justify-between">
+        <div className="news-container py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-primary rounded-lg">
                 <LayoutDashboard className="h-5 w-5 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-xl font-bold">एडमिन ड्यासबोर्ड</h1>
-                <p className="text-xs text-muted-foreground">प्रेस दर्पण व्यवस्थापन</p>
+                <h1 className="text-lg sm:text-xl font-bold">एडमिन ड्यासबोर्ड</h1>
+                <p className="text-xs text-muted-foreground hidden sm:block">प्रेस दर्पण व्यवस्थापन</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -171,9 +171,9 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <main className="news-container py-6 space-y-6">
+      <main className="news-container py-4 sm:py-6 space-y-4 sm:space-y-6">
         {/* Quick Actions */}
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           <Button asChild className="gap-2">
             <Link to="/admin/articles/new">
               <Plus className="h-4 w-4" />
@@ -209,13 +209,13 @@ export default function AdminDashboard() {
         </div>
 
         {/* Analytics Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
             <CardContent className="p-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <div>
-                  <p className="text-3xl font-bold text-primary">{stats?.totalArticles || 0}</p>
-                  <p className="text-sm text-muted-foreground">जम्मा समाचार</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-primary">{stats?.totalArticles || 0}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">जम्मा समाचार</p>
                 </div>
                 <div className="p-3 bg-primary/10 rounded-full">
                   <FileText className="h-6 w-6 text-primary" />
@@ -349,10 +349,11 @@ export default function AdminDashboard() {
           {/* Main Content Area */}
           <div className="lg:col-span-2">
             <Tabs defaultValue="articles" className="space-y-4">
-              <TabsList className="w-full justify-start bg-card border">
-                <TabsTrigger value="articles" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <FileText className="h-4 w-4" />
-                  समाचारहरू
+              <TabsList className="w-full justify-start bg-card border overflow-x-auto flex-nowrap">
+                <TabsTrigger value="articles" className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">समाचारहरू</span>
+                  <span className="sm:hidden">समाचार</span>
                 </TabsTrigger>
                 {canManageCategories && (
                   <TabsTrigger id="categories-tab" value="categories" className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
