@@ -17,7 +17,7 @@ export function CategorySection({ categoryName, categorySlug, limit = 4 }: Categ
     return (
       <section className="mb-8">
         <div className="news-section-title">{categoryName}</div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
             <Skeleton key={i} className="h-64 rounded-md" />
           ))}
@@ -42,7 +42,7 @@ export function CategorySection({ categoryName, categorySlug, limit = 4 }: Categ
           <ChevronRight className="h-4 w-4" />
         </Link>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {articles.map((article) => (
           <ArticleCard key={article.id} article={article} />
         ))}

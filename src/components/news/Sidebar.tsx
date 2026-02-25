@@ -9,7 +9,7 @@ export function Sidebar() {
   const { data: recentArticles, isLoading: recentLoading } = useRecentArticles(5);
 
   return (
-    <aside className="space-y-6">
+    <aside className="space-y-6 md:grid md:grid-cols-2 md:gap-6 md:space-y-0 lg:grid-cols-1 lg:gap-0 lg:space-y-6">
       {/* Sidebar Ad - Top */}
       <AdDisplay placement="sidebar" className="w-full aspect-[300/250]" />
 

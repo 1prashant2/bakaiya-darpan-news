@@ -68,11 +68,12 @@ export function ArticleCard({ article, variant = 'default', showShare = true }: 
       to={`/article/${article.slug}`}
       className="news-card group block"
     >
-      <div className="aspect-news-card overflow-hidden">
+      <div className="aspect-video overflow-hidden">
         <img
           src={article.image_url || '/placeholder.svg'}
           alt={article.title}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
         />
       </div>
       <div className="p-4">
@@ -81,7 +82,7 @@ export function ArticleCard({ article, variant = 'default', showShare = true }: 
             {article.categories.name}
           </span>
         )}
-        <h3 className="news-heading text-base sm:text-lg line-clamp-2 mb-2">
+        <h3 className="news-heading text-sm sm:text-base md:text-lg line-clamp-2 mb-2">
           {article.title}
         </h3>
         {article.excerpt && (
