@@ -6,11 +6,13 @@ import { useCategories } from '@/hooks/useCategories';
 import { useProvinces, useDistricts } from '@/hooks/useLocations';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
+import { useArticleTags, upsertTagsByName, syncArticleTags } from '@/hooks/useTags';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
@@ -26,7 +28,7 @@ import { AINewsGenerator } from './AINewsGenerator';
 import { HeadlineSuggestions } from './HeadlineSuggestions';
 import { SocialMediaGenerator } from './SocialMediaGenerator';
 import { SEOSuggestions } from './SEOSuggestions';
-import { Loader2, Save, ArrowLeft, CalendarIcon, Clock, X } from 'lucide-react';
+import { Loader2, Save, ArrowLeft, CalendarIcon, Clock, X, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Article } from '@/lib/types';
 
@@ -55,13 +57,23 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
     (article as any)?.scheduled_at ? format(new Date((article as any).scheduled_at), 'HH:mm') : '08:00'
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [tagInput, setTagInput] = useState('');
+  const [tagNames, setTagNames] = useState<string[]>([]);
 
   const { data: categories } = useCategories();
   const { data: provinces } = useProvinces();
   const { data: districts } = useDistricts(provinceId || undefined);
+  const { data: existingTags } = useArticleTags(isEditing ? article?.id : undefined);
   const { t, language } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Load existing tags when editing
+  useEffect(() => {
+    if (isEditing && existingTags && existingTags.length > 0 && tagNames.length === 0) {
+      setTagNames(existingTags.map((at: any) => at.tag?.name).filter(Boolean));
+    }
+  }, [existingTags, isEditing]);
 
   // Reset district when province changes
   useEffect(() => {
@@ -124,6 +136,8 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
         updated_at: new Date().toISOString(),
       };
 
+      let articleId = article?.id;
+
       if (isEditing && article?.id) {
         const { error } = await supabase
           .from('articles')
@@ -131,23 +145,29 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
           .eq('id', article.id);
 
         if (error) throw error;
-
-        toast({
-          title: 'सफलता',
-          description: 'समाचार सफलतापूर्वक अपडेट भयो',
-        });
       } else {
-        const { error } = await supabase
+        const { data: created, error } = await supabase
           .from('articles')
-          .insert([articleData]);
+          .insert([articleData])
+          .select('id')
+          .single();
 
         if (error) throw error;
-
-        toast({
-          title: 'सफलता',
-          description: 'समाचार सफलतापूर्वक सिर्जना भयो',
-        });
+        articleId = created?.id;
       }
+
+      // Save tags
+      if (articleId && tagNames.length > 0) {
+        const tags = await upsertTagsByName(tagNames);
+        await syncArticleTags(articleId, tags.map(t => t.id));
+      } else if (articleId) {
+        await syncArticleTags(articleId, []);
+      }
+
+      toast({
+        title: 'सफलता',
+        description: isEditing ? 'समाचार सफलतापूर्वक अपडेट भयो' : 'समाचार सफलतापूर्वक सिर्जना भयो',
+      });
 
       navigate('/admin');
     } catch (error: any) {
@@ -433,8 +453,49 @@ export function ArticleForm({ article, isEditing = false }: ArticleFormProps) {
             />
           </div>
 
+          {/* Tags */}
           <div className="space-y-2">
-            <Label>{t.admin.articleImage}</Label>
+            <Label className="flex items-center gap-1.5">
+              <Tag className="h-3.5 w-3.5" />
+              ट्यागहरू
+            </Label>
+            <div className="flex gap-2">
+              <Input
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    const val = tagInput.trim().replace(/,$/,'');
+                    if (val && !tagNames.includes(val)) {
+                      setTagNames([...tagNames, val]);
+                    }
+                    setTagInput('');
+                  }
+                }}
+                placeholder="ट्याग टाइप गर्नुहोस्, Enter थिच्नुहोस्"
+                className="text-sm"
+              />
+            </div>
+            {tagNames.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {tagNames.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="gap-1 text-xs">
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => setTagNames(tagNames.filter(t => t !== tag))}
+                      className="hover:text-destructive"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              कम्मा वा Enter ले छुट्ट्याउनुहोस्
+            </p>
             <ImageUpload
               currentImage={imageUrl}
               onImageUpload={setImageUrl}

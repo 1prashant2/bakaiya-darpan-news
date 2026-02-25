@@ -4,8 +4,9 @@ import { useArticle, useArticles } from '@/hooks/useArticles';
 import { ArticleCard } from '@/components/news/ArticleCard';
 import { Sidebar } from '@/components/news/Sidebar';
 import { format } from 'date-fns';
-import { Clock, User, Share2, Facebook, Twitter, Check, Copy, MessageCircle, Instagram, BookOpen } from 'lucide-react';
+import { Clock, User, Share2, Facebook, Twitter, Check, Copy, MessageCircle, Instagram, BookOpen, Tag } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
@@ -228,6 +229,20 @@ export default function ArticlePage() {
                 <p key={i} className="mb-5">{p}</p>
               ))}
             </div>
+
+            {/* Tags */}
+            {article.article_tags && article.article_tags.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 mt-6 pt-4 border-t border-border">
+                <Tag className="h-4 w-4 text-muted-foreground" />
+                {article.article_tags.map((at) => (
+                  at.tag && (
+                    <Badge key={at.id} variant="secondary" className="text-xs">
+                      {at.tag.name}
+                    </Badge>
+                  )
+                ))}
+              </div>
+            )}
 
             {relatedArticles && relatedArticles.length > 1 && (
               <section className="mt-12 pt-8 border-t border-border">
