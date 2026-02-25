@@ -23,6 +23,21 @@ export interface District {
   created_at: string;
 }
 
+export interface Tag {
+  id: string;
+  name: string;
+  slug: string;
+  created_at: string;
+}
+
+export interface ArticleTag {
+  id: string;
+  article_id: string;
+  tag_id: string;
+  tag?: Tag;
+  created_at: string;
+}
+
 export interface Article {
   id: string;
   title: string;
@@ -43,6 +58,7 @@ export interface Article {
   categories?: Category;
   provinces?: Province;
   districts?: District;
+  article_tags?: ArticleTag[];
 }
 
 export interface Profile {

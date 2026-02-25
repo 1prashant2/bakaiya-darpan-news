@@ -67,13 +67,21 @@ export function useArticle(slug: string) {
         .from('articles')
         .select(`
           *,
-          categories (*)
+          categories (*),
+          article_tags (*, tags(*))
         `)
         .eq('slug', slug)
         .eq('is_published', true)
         .single();
 
       if (error) throw error;
+      // Map article_tags to include tag reference
+      if (data?.article_tags) {
+        data.article_tags = (data.article_tags as any[]).map((at: any) => ({
+          ...at,
+          tag: at.tags,
+        }));
+      }
       return data as Article;
     },
     enabled: !!slug,
