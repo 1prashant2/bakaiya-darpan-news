@@ -252,23 +252,32 @@ export type Database = {
         Row: {
           created_at: string | null
           email: string | null
+          facebook_url: string | null
           id: string
           name: string | null
           updated_at: string | null
+          whatsapp_number: string | null
+          x_url: string | null
         }
         Insert: {
           created_at?: string | null
           email?: string | null
+          facebook_url?: string | null
           id: string
           name?: string | null
           updated_at?: string | null
+          whatsapp_number?: string | null
+          x_url?: string | null
         }
         Update: {
           created_at?: string | null
           email?: string | null
+          facebook_url?: string | null
           id?: string
           name?: string | null
           updated_at?: string | null
+          whatsapp_number?: string | null
+          x_url?: string | null
         }
         Relationships: []
       }

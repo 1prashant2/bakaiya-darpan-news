@@ -102,11 +102,9 @@ export function ArticleCard({ article, variant = 'default', showShare = true }: 
         </div>
         {showShare && (
           <ShareButtons
-            articleId={article.id}
-            articleTitle={article.title}
-            articleUrl={articleUrl}
-            articleExcerpt={article.excerpt || undefined}
-            articleImageUrl={article.image_url || undefined}
+            url={articleUrl}
+            title={article.title}
+            excerpt={article.excerpt || undefined}
             size="sm"
             className="mt-2 pt-2 border-t border-border justify-center"
           />
