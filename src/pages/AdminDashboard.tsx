@@ -323,7 +323,7 @@ export default function AdminDashboard() {
                 recentArticles.map((article) => (
                   <Link
                     key={article.id}
-                    to={`/admin/articles/${article.id}`}
+                    to={`/admin/articles/edit/${article.id}`}
                     className="block p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors group"
                   >
                     <div className="flex items-start justify-between gap-2">
