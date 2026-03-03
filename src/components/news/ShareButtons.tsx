@@ -25,28 +25,9 @@ export function ShareButtons({
 
   const fullUrl = url.startsWith('http') ? url : `${window.location.origin}${url}`;
 
-  const shareOnFacebook = () => {
-    window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(fullUrl)}`,
-      '_blank',
-      'width=600,height=400'
-    );
-  };
-
-  const shareOnTwitter = () => {
-    window.open(
-      `https://twitter.com/intent/tweet?url=${encodeURIComponent(fullUrl)}&text=${encodeURIComponent(title)}`,
-      '_blank',
-      'width=600,height=400'
-    );
-  };
-
-  const shareOnWhatsApp = () => {
-    window.open(
-      `https://wa.me/?text=${encodeURIComponent(title + ' ' + fullUrl)}`,
-      '_blank'
-    );
-  };
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(fullUrl)}`;
+  const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(fullUrl)}&text=${encodeURIComponent(title)}`;
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(title + ' ' + fullUrl)}`;
 
   const nativeShare = async () => {
     if (navigator.share) {
@@ -79,14 +60,20 @@ export function ShareButtons({
       <div className={`space-y-2 ${className}`}>
         <p className="text-sm font-semibold text-muted-foreground">यो खबर शेयर गर्नुहोस्</p>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={shareOnFacebook} className="gap-2 hover:text-blue-600 hover:border-blue-300">
-            <Facebook className="h-4 w-4" /> Facebook
+          <Button variant="outline" size="sm" asChild className="gap-2 hover:text-blue-600 hover:border-blue-300">
+            <a href={facebookUrl} target="_blank" rel="noopener noreferrer">
+              <Facebook className="h-4 w-4" /> Facebook
+            </a>
           </Button>
-          <Button variant="outline" size="sm" onClick={shareOnTwitter} className="gap-2 hover:text-sky-500 hover:border-sky-300">
-            <Twitter className="h-4 w-4" /> X (Twitter)
+          <Button variant="outline" size="sm" asChild className="gap-2 hover:text-sky-500 hover:border-sky-300">
+            <a href={twitterUrl} target="_blank" rel="noopener noreferrer">
+              <Twitter className="h-4 w-4" /> X (Twitter)
+            </a>
           </Button>
-          <Button variant="outline" size="sm" onClick={shareOnWhatsApp} className="gap-2 hover:text-green-500 hover:border-green-300">
-            <MessageCircle className="h-4 w-4" /> WhatsApp
+          <Button variant="outline" size="sm" asChild className="gap-2 hover:text-green-500 hover:border-green-300">
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+              <MessageCircle className="h-4 w-4" /> WhatsApp
+            </a>
           </Button>
           <Button variant="outline" size="sm" onClick={nativeShare} className="gap-2 hover:text-primary hover:border-primary/30">
             <Share2 className="h-4 w-4" /> Share
@@ -102,14 +89,20 @@ export function ShareButtons({
 
   return (
     <div className={`flex items-center gap-0.5 ${className}`} onClick={(e) => e.preventDefault()}>
-      <Button variant="ghost" size="icon" onClick={shareOnFacebook} title="फेसबुकमा शेयर" className={`${buttonSize} hover:text-blue-600 hover:bg-blue-50`}>
-        <Facebook className={iconSize} />
+      <Button variant="ghost" size="icon" asChild title="फेसबुकमा शेयर" className={`${buttonSize} hover:text-blue-600 hover:bg-blue-50`}>
+        <a href={facebookUrl} target="_blank" rel="noopener noreferrer">
+          <Facebook className={iconSize} />
+        </a>
       </Button>
-      <Button variant="ghost" size="icon" onClick={shareOnTwitter} title="X मा शेयर" className={`${buttonSize} hover:text-sky-500 hover:bg-sky-50`}>
-        <Twitter className={iconSize} />
+      <Button variant="ghost" size="icon" asChild title="X मा शेयर" className={`${buttonSize} hover:text-sky-500 hover:bg-sky-50`}>
+        <a href={twitterUrl} target="_blank" rel="noopener noreferrer">
+          <Twitter className={iconSize} />
+        </a>
       </Button>
-      <Button variant="ghost" size="icon" onClick={shareOnWhatsApp} title="WhatsApp मा शेयर" className={`${buttonSize} hover:text-green-500 hover:bg-green-50`}>
-        <MessageCircle className={iconSize} />
+      <Button variant="ghost" size="icon" asChild title="WhatsApp मा शेयर" className={`${buttonSize} hover:text-green-500 hover:bg-green-50`}>
+        <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+          <MessageCircle className={iconSize} />
+        </a>
       </Button>
       <Button variant="ghost" size="icon" onClick={nativeShare} title="शेयर गर्नुहोस्" className={`${buttonSize} hover:text-primary hover:bg-primary/10`}>
         <Share2 className={iconSize} />
